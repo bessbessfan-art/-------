@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>狗狗年齡換算器</title>
+
+    <style>
+        body {
+            font-family: "Segoe UI", Arial;
+            background: #fef9f3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .card {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            width: 340px;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #444;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #ff914d;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #ff7a29;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* 🐶 圖片置中 */
+        #dogImage {
+            margin: 20px auto;
+            width: 260px;
+            display: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+        }
+
+        /* 📝 公式說明 */
+        #formulaNote {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+            max-width: 600px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="card">
+        <h2>🐶 狗狗年齡換算器</h2>
+
+        <input type="date" id="birth-date" />
+
+        <button type="button" onclick="calculateAge()">開始計算</button>
+
+        <div id="result"></div>
+
+        <img id="dogImage" alt="cartoon dog">
+    </div>
+
+    <!-- 📝 新增公式說明 -->
+    <div id="formulaNote">
+        美國加州大學聖地牙哥分校的研究團隊將人類和犬隻的 DNA 變化列入，產生單一函數：
+        <strong>human_age = 16 ln ( dog_age ) + 31</strong>，是目前用來記算狗狗人類年齡的最新公式。
+    </div>
+
+    <script>
+        const cartoonDogs = [
+            "https://images.unsplash.com/photo-1505628346881-b72b27e84530?w=600&auto=format&fit=crop&q=60",
+            "https://plus.unsplash.com/premium_photo-1708366645058-2609c773269e?w=600&auto=format&fit=crop&q=60",
+            "https://images.unsplash.com/photo-1517849845537-4d257902454a?w=600&auto=format&fit=crop&q=60",
+            "https://images.unsplash.com/photo-1555370358-a7ce3ab16f60?q=80&w=867&auto=format&fit=crop",
+            "https://plus.unsplash.com/premium_photo-1708724049005-192fe5c23269?w=600&auto=format&fit=crop&q=60"
+                            ];
+
+        // 頁面載入時，顯示上次計算結果
+        window.addEventListener("DOMContentLoaded", () => {
+            const savedDate = localStorage.getItem("dogBirthDate");
+            const savedHumanAge = localStorage.getItem("humanAge");
+            const savedDogImg = localStorage.getItem("dogImg");
+
+            if (savedDate && savedHumanAge && savedDogImg) {
+                document.getElementById("birth-date").value = savedDate;
+                document.getElementById("result").textContent = `我已經是 ${savedHumanAge} 歲 的人類囉！`;
+                const dogImg = document.getElementById("dogImage");
+                dogImg.src = savedDogImg;
+                dogImg.style.display = "block";
+            }
+        });
+
+        function calculateAge() {
+            const birthInput = document.getElementById("birth-date").value;
+            const resultDiv = document.getElementById("result");
+            const dogImg = document.getElementById("dogImage");
+
+            if (!birthInput) {
+                resultDiv.textContent = "請先輸入狗狗的生日！";
+                dogImg.style.display = "none";
+                return;
+            }
+
+            const birthDate = new Date(birthInput);
+            const today = new Date();
+
+            if (birthDate > today) {
+                resultDiv.textContent = "生日不能在未來喔！";
+                dogImg.style.display = "none";
+                return;
+            }
+
+            // 計算狗狗年齡
+            const diffTime = today - birthDate;
+            const dogAge = diffTime / (1000 * 60 * 60 * 24 * 365);
+            const safeDogAge = Math.max(dogAge, 0.1);
+
+            const humanAge = Math.round(16 * Math.log(safeDogAge) + 31);
+            resultDiv.textContent = `我已經是 ${humanAge} 歲的人類囉！`;
+
+            // 隨機選圖
+            const randomDog = cartoonDogs[Math.floor(Math.random() * cartoonDogs.length)];
+            dogImg.src = randomDog;
+            dogImg.style.display = "block";
+
+            // 儲存生日、計算結果與圖片到 localStorage
+            localStorage.setItem("dogBirthDate", birthInput);
+            localStorage.setItem("humanAge", humanAge);
+            localStorage.setItem("dogImg", randomDog);
+        }
+    </script>
+
+</body>
+</html>
